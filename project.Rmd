@@ -1,0 +1,87 @@
+---
+title: "Project"
+author: "Tohaku"
+date: '2023-03-09'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Set-up
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(caret)
+```
+
+```{r, message=FALSE, warning=FALSE}
+training <- read.csv("./pml-training.csv")
+testing <- read.csv("./pml-testing.csv")
+```
+
+## Pre-processing
+
+Remove summary statistics from the datasets.
+
+```{r}
+prefixes <- c("kurtosis_", "skewness_", "max_", "min_", "amplitude_", "var_", "avg_", "stddev_")
+training <- training |> select(-starts_with(prefixes))
+testing <- testing |> select(-starts_with(prefixes))
+```
+
+Remove non-substantial variables from the datasets.
+
+```{r}
+training_x <- training[,-c(1:7,ncol(training))]
+training_y <- factor(training$classe)
+testing_x <- testing[,-c(1:7,ncol(testing))]
+```
+
+The first 20 principle components explain more than 99 percent of the variability.
+
+```{r}
+pca <- prcomp(training_x)
+s <- summary(pca)
+barplot(s$importance[3,1:20],ylim=c(0,1) )
+abline(h = 0.99, col="red", lty=5)
+```
+
+To reduce run time, let's use the first 20 principle components as the predictors.
+
+```{r}
+preProc <- preProcess(training_x, method = c("pca"), pcaComp=20)
+training_pre_x <- predict(preProc, training_x)
+testing_pre_x <- predict(preProc, testing_x)
+```
+
+## Training
+
+Train the random forest model with 5-fold cross validation.
+
+```{r}
+set.seed(1234)
+trControl <- 
+  trainControl(method = "cv", 
+               number = 5, 
+               allowParallel = TRUE)
+fit <- 
+  train(x = training_pre_x,
+        y = training_y,
+        method = "rf",
+        trControl = trControl)
+```
+
+Here is the result.
+
+```{r}
+fit
+```
+
+## Prediction
+
+```{r}
+predict(fit, testing_pre_x)
+```
+
