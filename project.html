@@ -413,7 +413,7 @@ fit &lt;-
         y = training_y,
         method = &quot;rf&quot;,
         trControl = trControl)</code></pre>
-<p>Here is the result.</p>
+<p>Here is the result. The accuracy of the final model is above 97%.</p>
 <pre class="r"><code>fit</code></pre>
 <pre><code>## Random Forest 
 ## 
@@ -433,6 +433,23 @@ fit &lt;-
 ## 
 ## Accuracy was used to select the optimal model using the largest value.
 ## The final value used for the model was mtry = 2.</code></pre>
+<p>The OOB estimate is given below:</p>
+<pre class="r"><code>fit$finalModel</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(x = x, y = y, mtry = param$mtry) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 1.71%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 5544   13   13    7    3 0.006451613
+## B   43 3717   32    1    4 0.021069265
+## C    6   36 3353   25    2 0.020163647
+## D    3    2   99 3108    4 0.033582090
+## E    1    9   17   15 3565 0.011644026</code></pre>
 </div>
 <div id="prediction" class="section level2">
 <h2>Prediction</h2>

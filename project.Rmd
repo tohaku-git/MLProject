@@ -73,10 +73,15 @@ fit <-
         trControl = trControl)
 ```
 
-Here is the result.
+Here is the result. The accuracy of the final model is above 97%.
 
 ```{r}
 fit
+```
+The OOB estimate is given below:
+
+```{r}
+fit$finalModel
 ```
 
 ## Prediction
